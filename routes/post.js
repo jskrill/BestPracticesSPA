@@ -20,6 +20,7 @@ module.exports = function(app, config) {
                 post.save();
                 articleDoc.posts.push(post._id);
                 articleDoc.save();
+                res.send(200);
             });
         } else {
             e = new Error("Post message was not supplied for creation"); 
@@ -39,6 +40,7 @@ module.exports = function(app, config) {
                 }
                 doc.message = message;
                 doc.save();
+                res.json(doc);
             });
         } else {
             e = new Error("Post message was not supplied for update"); 
@@ -61,6 +63,7 @@ module.exports = function(app, config) {
                 next(err);
             }
             doc.remove();
+            res.send(200);
         });
     });
 

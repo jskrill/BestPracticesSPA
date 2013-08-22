@@ -1,9 +1,10 @@
-var path = require("path");
+var path = require("path"),
+    fs = require("fs");
 
 module.exports = function(app, config) {
     app.get("/view/:view", function(req, res, next) {
         var view,
-            filePath
+            filePath,
             e;
         view = req.param("view");
         filePath = path.join(config.templatePath, view) + ".html";
@@ -20,7 +21,7 @@ module.exports = function(app, config) {
 
     app.get("/view/partial/:partial", function(req, res, next) {
         var partial,
-            filePath
+            filePath,
             e;
         partial = req.param("partial");
         filePath = path.join(config.templatePath + "/partial", partial) + ".html";

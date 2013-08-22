@@ -13,15 +13,15 @@ var staticConfig = {
 
 module.exports = {
     "test": _.defaults({
-        "db": "mongodb//localhost/BestPractices-test",
+        "db": "mongodb://localhost/BestPractices_test",
         "env": "test"
     },staticConfig),
     "developement": _.defaults({
-        "db": "mongodb//localhost/BestPractices-dev",
+        "db": "mongodb://localhost/BestPractices_dev",
         "env": "developement"
     },staticConfig),
     "production": _.defaults({
-        "db": "mongodb//localhost/BestPractices-prod",
+        "db": "mongodb://localhost/BestPractices_prod",
         "env": "production"
     },staticConfig)
 }

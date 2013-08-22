@@ -5,7 +5,9 @@ var express = require("express"),
     env = process.env.NODE_ENV || "developement",
     port = process.env.PORT || 3000,
     config = require("./config/config")[env],
+    mongoose = require("mongoose");
 
+mongoose.connect(config.db);
 
 require("./config/middleware")(app, config);
 

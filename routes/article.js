@@ -10,6 +10,7 @@ module.exports = function(app, config) {
             doc;
         doc = new Article({"title": title});
         doc.save(); 
+        res.json(200);
     });
 
     app.post("/article/update/:id", function(req, res, next) {
@@ -52,6 +53,7 @@ module.exports = function(app, config) {
                 next(err);
             }
             doc.remove();
+            res.json(200);
         });
 
     });
@@ -59,7 +61,7 @@ module.exports = function(app, config) {
     //PRACTICAL
     app.get("/article/all", function(req, res, next) {
         Article.find({}, function(err, docs) {
-            return res.json(docs); 
+            res.json(docs); 
         });
     });
 
