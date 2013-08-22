@@ -9,11 +9,15 @@ module.exports = function(app, config) {
         var title = req.param("title"),
             doc;
         doc = new Article({"title": title});
-        doc.save(); 
-        res.json(200);
+        doc.save(function(err, savedDoc){
+            if (err) {
+                next(err);
+            }
+            res.json(savedDoc);
+        }); 
     });
 
-    app.post("/article/update/:id", function(req, res, next) {
+    app.put("/article/update/:id", function(req, res, next) {
         var id = req.param("id"),
             title = req.body.title,
             e;
@@ -24,8 +28,12 @@ module.exports = function(app, config) {
                     next(err);
                 }
                 doc.title = title;
-                doc.save();
-                res.json(doc);
+                doc.save(function(err, savedDoc){
+                    if (err) {
+                        next(err);
+                    }
+                    res.json(savedDoc);
+                });
             });
         } else {
             e = new Error("Article update was not supplied a new title"); 
@@ -46,14 +54,18 @@ module.exports = function(app, config) {
         
     });
 
-    app.get("/article/destroy/:id", function(req, res, next) {
+    app.delete("/article/destroy/:id", function(req, res, next) {
         var id = req.param("id"); 
         Article.findById(id, function(err, doc) {
             if (err) {
                 next(err);
             }
-            doc.remove();
-            res.json(200);
+            doc.remove(function(err){
+                if (err) {
+                    next(err);
+                }
+                res.json(200);
+            });
         });
 
     });
@@ -61,6 +73,9 @@ module.exports = function(app, config) {
     //PRACTICAL
     app.get("/article/all", function(req, res, next) {
         Article.find({}, function(err, docs) {
+            if (err) {
+                next(err);
+            }
             res.json(docs); 
         });
     });

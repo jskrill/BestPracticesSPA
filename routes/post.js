@@ -17,10 +17,18 @@ module.exports = function(app, config) {
                     next(err);
                 }
                 post = new Post({message: message, _creator: articleId});
-                post.save();
-                articleDoc.posts.push(post._id);
-                articleDoc.save();
-                res.send(200);
+                post.save(function(err, savedPost) {
+                    if (err) {
+                        next(err);
+                    }
+                    articleDoc.posts.push(savedPost._id);
+                    articleDoc.save(function(err, savedArticle) {
+                        if (err) {
+                            next(err);
+                        }
+                        res.json(savedPost);
+                    });
+                });
             });
         } else {
             e = new Error("Post message was not supplied for creation"); 
@@ -39,8 +47,12 @@ module.exports = function(app, config) {
                     next(err);
                 }
                 doc.message = message;
-                doc.save();
-                res.json(doc);
+                doc.save(function(err, savedDoc){
+                    if (err) {
+                        next(err);
+                    }
+                    res.json(savedDoc);
+                });
             });
         } else {
             e = new Error("Post message was not supplied for update"); 
@@ -52,6 +64,9 @@ module.exports = function(app, config) {
     app.get("/post/read/:id", function(req, res, next) {
         var id = req.param("id");
         Post.findById(id, function (err, doc) {
+            if (err) {
+                next(err);
+            }
             res.json(doc);
         });
     });
@@ -62,8 +77,12 @@ module.exports = function(app, config) {
             if (err) {
                 next(err);
             }
-            doc.remove();
-            res.send(200);
+            doc.remove(function(err){
+                if (err) {
+                    next(err);
+                }
+                res.send(200);
+            });
         });
     });
 
