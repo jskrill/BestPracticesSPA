@@ -16,7 +16,7 @@ module.exports = function(app, config) {
                 if (err) {
                     next(err);
                 }
-                post = new Post({message: message, _creator: articleId});
+                post = new Post({message: message, _article: articleId});
                 post.save(function(err, savedPost) {
                     if (err) {
                         next(err);
