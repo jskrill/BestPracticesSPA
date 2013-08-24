@@ -4,7 +4,7 @@ var mongoose = require("mongoose"),
     Post;
 
 postSchema = Schema({
-    message: String,
+    message: { type: String, required: true },
     upvotes: { type: Number, default: 0 },
     _article: { type: Schema.Types.ObjectId, ref: "Article" },
     _created: { type: Date, default: Date.now }

@@ -11,10 +11,12 @@ var should = require("should"),
 describe("Article", function() {
     var articleId;
 
-    describe("POST /article/create/:title", function() {
+    describe("POST /article/create", function() {
         it("should respond with json of the newly created article", function(done) {
             request(url)
-                .post("/article/create/test")
+                .post("/article/create")
+                .set("Content-Type", "application/json")
+                .send({"title": "test"})
                 .expect("Content-Type", /json/)
                 .expect(200)
                 .end(function(err, res) {
@@ -32,12 +34,12 @@ describe("Article", function() {
     });
 
 
-    describe("PUT /article/update/:id", function() {
+    describe("PUT /article/update", function() {
         it("should respond with json of updated article", function(done) {
             request(url)
-                .put("/article/update/" + articleId)
+                .put("/article/update")
                 .set("Content-Type", "application/json")
-                .send({"title": "testupdate"})
+                .send({"_id": articleId, "title": "testupdate"})
                 .expect("Content-Type", /json/)
                 .expect(200)
                 .end(function(err, res) {
@@ -101,7 +103,9 @@ describe("Post", function() {
         postId;
     before(function(done) {
         request(url)
-            .post("/article/create/test")
+            .post("/article/create")
+            .set("Content-Type", "application/json")
+            .send({"title": "test"})
             .expect("Content-Type", /json/)
             .expect(200)
             .end(function(err, res) {
@@ -111,12 +115,27 @@ describe("Post", function() {
             });
     });
 
+    after(function(done) {
+        request(url)
+            .del("/article/destroy/" + articleId)
+            .end(function(err) {
+                if (err) throw err;
+                request(url)
+                    .del("/post/destroy/" + postId)
+                    .end(function(err) {
+                        if (err) throw err;
+                        done();
+                    });
+            });
+    });
 
-    describe("POST /post/create/:articleId", function(){
+
+    describe("POST /post/create", function(){
         it("should return the newly created post as json", function(done){
             request(url)
-                .post("/post/create/" + articleId)
-                .send({"message": "testMessage1"})
+                .post("/post/create")
+                .set("Content-Type", "application/json")
+                .send({"_article": articleId, "message": "testMessage1"})
                 .expect("Content-Type", /json/)
                 .expect(200)
                 .end(function(err, resPost){
@@ -142,11 +161,11 @@ describe("Post", function() {
 
     });
 
-    describe("PUT /post/update/:id", function(){
+    describe("PUT /post/update", function(){
         it("should update the post and return it as json", function(done){
             request(url)
-                .put("/post/update/" + postId)
-                .send({"message": "testMessage2"})
+                .put("/post/update")
+                .send({"_id": postId, "message": "testMessage2"})
                 .expect("Content-Type", /json/)
                 .expect(200)
                 .end(function(err, res){

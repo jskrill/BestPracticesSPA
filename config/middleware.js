@@ -1,8 +1,10 @@
 var express = require("express"),
     winston = require("winston"),
-    expressWinston = require("express-winston");
+    expressWinston = require("express-winston"),
+    errorHandler;
 
 module.exports = function(app, config) {
+    errorHandler = require("./errorHandler")[config.env];
     app.use(express.favicon());
     app.use(express.static(config.rootPath + "/public"));
     app.configure(function () {
@@ -28,5 +30,11 @@ module.exports = function(app, config) {
                 })
             ]
         }));
+        app.use(errorHandler);
+    });
+
+    process.on("uncaughtException", function(err){
+        errorHandler(err);
     });
 }
+

@@ -1,4 +1,5 @@
 var mongoose = require("mongoose"),
+    _ = require("underscore"),
     Article,
     Post;
 
@@ -7,16 +8,16 @@ module.exports = function(app, config) {
     Post = require(config.rootPath + "/models/PostModel");
 
     //CRUD
-    app.post("/post/create/:articleId", function(req, res, next) {
-        var articleId = req.param("articleId"),
-            post,
-            message = req.body.message;
-        if (message) {
-            Article.findById(articleId, function(err, articleDoc) {
+    app.post("/post/create", function(req, res, next) {
+        var data = req.body,
+            _article = data._article,
+            post;
+        if (_article) {
+            Article.findById(_article, function(err, articleDoc) {
                 if (err) {
                     next(err);
                 }
-                post = new Post({message: message, _article: articleId});
+                post = new Post(data);
                 post.save(function(err, savedPost) {
                     if (err) {
                         next(err);
@@ -31,22 +32,22 @@ module.exports = function(app, config) {
                 });
             });
         } else {
-            e = new Error("Post message was not supplied for creation"); 
+            e = new Error("_article (article id) was not supplied"); 
             e.status = 500;
             next(e);
         }
     });
 
-    app.put("/post/update/:id", function(req, res, next) {
-        var id = req.param("id"),
-            post,
-            message = req.body.message;
-        if (message) {
-            Post.findById(id, function(err, doc) {
+    app.put("/post/update", function(req, res, next) {
+        var data = req.body,
+            _id = data._id;
+
+        if (_id){
+            Post.findById(_id, function(err, doc) {
                 if (err) {
                     next(err);
                 }
-                doc.message = message;
+                _.extend(doc, data);
                 doc.save(function(err, savedDoc){
                     if (err) {
                         next(err);
@@ -55,15 +56,15 @@ module.exports = function(app, config) {
                 });
             });
         } else {
-            e = new Error("Post message was not supplied for update"); 
+            e = new Error("Post _id was node supplied"); 
             e.status = 500;
             next(e);
         }
     });
 
     app.get("/post/read/:id", function(req, res, next) {
-        var id = req.param("id");
-        Post.findById(id, function (err, doc) {
+        var _id = req.param("id");
+        Post.findById(_id, function (err, doc) {
             if (err) {
                 next(err);
             }
@@ -72,8 +73,8 @@ module.exports = function(app, config) {
     });
 
     app.delete("/post/destroy/:id", function(req, res, next) {
-        var id = req.param("id");
-        Post.findById(id, function (err, doc) {
+        var _id = req.param("id");
+        Post.findById(_id, function (err, doc) {
             if (err) {
                 next(err);
             }
@@ -97,6 +98,11 @@ module.exports = function(app, config) {
             }
             res.json(doc.posts);
         });
+    });
+
+    app.get("/post/clear", function(req, res, next) {
+        Post.collection.drop();
+        res.send(200);
     });
 
 }

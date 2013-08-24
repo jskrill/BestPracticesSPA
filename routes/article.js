@@ -1,14 +1,15 @@
 var mongoose = require("mongoose"),
+    _ = require("underscore"),
     Article;
 
 module.exports = function(app, config) {
     Article = require(config.rootPath + "/models/ArticleModel");
 
     //CRUD
-    app.post("/article/create/:title", function(req, res, next) {
-        var title = req.param("title"),
-            doc;
-        doc = new Article({"title": title});
+    app.post("/article/create", function(req, res, next) {
+        var data = req.body,
+            doc  = new Article(data);
+
         doc.save(function(err, savedDoc){
             if (err) {
                 next(err);
@@ -17,17 +18,17 @@ module.exports = function(app, config) {
         }); 
     });
 
-    app.put("/article/update/:id", function(req, res, next) {
-        var id = req.param("id"),
-            title = req.body.title,
+    app.put("/article/update", function(req, res, next) {
+        var data = req.body,
+            _id = req.body._id,
             e;
 
-        if (title) {
-            Article.findById(id, function(err, doc) {
+        if (_id){ 
+            Article.findById(_id, function(err, doc) {
                 if (err) {
                     next(err);
                 }
-                doc.title = title;
+                _.extend(doc, data);
                 doc.save(function(err, savedDoc){
                     if (err) {
                         next(err);
@@ -36,7 +37,7 @@ module.exports = function(app, config) {
                 });
             });
         } else {
-            e = new Error("Article update was not supplied a new title"); 
+            e = new Error("Article _id was not supplied"); 
             e.status = 500;
             next(e);
         }
@@ -44,8 +45,8 @@ module.exports = function(app, config) {
     });
 
     app.get("/article/read/:id", function(req, res, next) {
-        var id = req.param("id"); 
-        Article.findById(id, function(err, doc) {
+        var _id = req.param("id"); 
+        Article.findById(_id, function(err, doc) {
             if (err) {
                 next(err);
             }
@@ -55,8 +56,8 @@ module.exports = function(app, config) {
     });
 
     app.delete("/article/destroy/:id", function(req, res, next) {
-        var id = req.param("id"); 
-        Article.findById(id, function(err, doc) {
+        var _id = req.param("id"); 
+        Article.findById(_id, function(err, doc) {
             if (err) {
                 next(err);
             }
@@ -78,6 +79,35 @@ module.exports = function(app, config) {
             }
             res.json(docs); 
         });
+    });
+
+    app.get("/article/count", function(req, res, next) {
+        Article.count(function(err, c) {
+            if (err) {
+                next(err);
+            }
+            res.json({"count": c});
+        });
+    });
+
+    app.get("/article/populate", function(req, res, next) {
+        var model,
+            titles = ["PHP", "Ruby", "Perl", "Python", "JSP", "ASP.NET",
+                      "Nodejs", "Mongoose", "Express", "Java", "Javascript",
+                      "Meteor", "Angular", "Dogo Toolkit", "MooTools",
+                      "YUI Library"];
+        _each(titles, function(title) {
+            model =  new Article({"title": title});
+            model.save(function(err) {
+                if (err) throw err;
+            });
+        }
+        res.send(200);
+    });
+
+    app.get("/article/clear", function(req, res, next) {
+        Article.collection.drop();  
+        res.send(200);
     });
 
 

@@ -4,7 +4,7 @@ var mongoose = require("mongoose"),
     Article;
 
 articleSchema = Schema({
-    title: String,
+    title: { type: String, unique: true, required: true },
     posts: [{ type: Schema.Types.ObjectId, ref: "Post" }]
 });
 

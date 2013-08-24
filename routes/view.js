@@ -24,7 +24,7 @@ module.exports = function(app, config) {
             filePath,
             e;
         partial = req.param("partial");
-        filePath = path.join(config.templatePath + "/partial", partial) + ".html";
+        filePath = path.join(config.templatePath + "/partials", partial) + ".html";
         fs.exists(filePath, function(exists) {
             if (exists) {
                 res.sendfile(filePath);
