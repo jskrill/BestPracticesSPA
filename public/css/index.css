@@ -13,4 +13,23 @@
 
 .span10 {
     padding: 0px 50px;
+    position: relative;
+}
+
+#articleEntries {
+    padding-left: none;
+    list-style: none;
+    margin-left: 0px;
+    float: left;
+}
+
+#articleEntries li {
+    line-height: normal;
+}
+
+#pagination {
+    float: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
